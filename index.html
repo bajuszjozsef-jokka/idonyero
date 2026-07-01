@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Időnyerő – AI marketing munkakörnyezet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:        #1C1A17;
+  --card:      #242220;
+  --primary:   #4A5E4A;
+  --accent:    #8FAF8F;
+  --text:      #F0EDE8;
+  --muted:     #B5A898;
+  --border:    rgba(240,237,232,0.08);
+  --danger:    #B4635A;
+  --radius-card: 10px;
+  --radius-btn: 6px;
+  --radius-input: 5px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:400;
+  line-height:1.5;
+  min-height:100vh;
+}
+h1,h2,h3,h4{font-weight:600;margin:0 0 .5em 0;}
+p{margin:0 0 .75em 0;}
+a{color:inherit;}
+button,input,select,textarea{font-family:inherit;font-size:14px;color:var(--text);}
+.small-label{font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+.container{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+/* ---------- Topnav ---------- */
+.topnav{
+  position:sticky;top:0;z-index:40;
+  background:rgba(28,26,23,0.92);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border);
+}
+.topnav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px;cursor:pointer;}
+.brand-mark{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--primary));display:flex;align-items:center;justify-content:center;font-size:13px;}
+.nav-links{display:flex;gap:4px;}
+.nav-link{padding:8px 14px;border-radius:var(--radius-btn);cursor:pointer;color:var(--muted);font-weight:500;font-size:13px;}
+.nav-link:hover{color:var(--text);background:var(--card);}
+.nav-link.active{color:var(--text);background:var(--card);}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 16px;border-radius:var(--radius-btn);border:1px solid transparent;
+  cursor:pointer;font-weight:500;font-size:13px;transition:opacity .15s ease;
+  background:var(--card);color:var(--text);border-color:var(--border);
+}
+.btn:hover{opacity:.85;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#16211a;font-weight:600;}
+.btn-ghost{background:transparent;border-color:var(--border);}
+.btn-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+.btn-sm{padding:6px 11px;font-size:12px;}
+.btn-icon{padding:7px 9px;}
+
+/* ---------- Cards / layout ---------- */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);padding:20px;}
+.page{padding:32px 0 80px 0;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+.grid{display:grid;gap:16px;}
+.grid-clients{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+.grid-blocks{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+.section-title{font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:28px 0 12px 0;}
+.section-title:first-child{margin-top:0;}
+
+/* ---------- Client card ---------- */
+.client-card{position:relative;cursor:pointer;border-left:3px solid var(--project-color,var(--accent));}
+.client-card-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.client-card-name{font-weight:600;font-size:15px;margin-bottom:4px;}
+.client-card-industry{color:var(--muted);font-size:12.5px;}
+.star-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;line-height:1;}
+.star-btn.starred{color:#D8B14E;}
+.client-card-meta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
+/* ---------- Badges / chips ---------- */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.02em;background:rgba(240,237,232,.08);color:var(--muted);}
+.badge-active{color:#9FCB9F;background:rgba(143,175,143,.14);}
+.badge-paused{color:#D8B14E;background:rgba(216,177,78,.14);}
+.badge-archived{color:var(--muted);background:rgba(181,168,152,.14);}
+.badge-trash{color:var(--danger);background:rgba(180,99,90,.14);}
+.badge-draft{color:var(--muted);background:rgba(181,168,152,.14);}
+.badge-reviewing{color:#D8B14E;background:rgba(216,177,78,.14);}
+.badge-approved{color:#9FCB9F;background:rgba(143,175,143,.14);}
+.badge-delivered{color:#8FAFC9;background:rgba(122,143,166,.14);}
+.chip{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11.5px;background:rgba(240,237,232,.06);color:var(--muted);border:1px solid var(--border);}
+
+/* ---------- Forms ---------- */
+.field{margin-bottom:16px;}
+.field label{display:block;margin-bottom:6px;}
+.input,textarea,select.input{
+  width:100%;padding:9px 12px;border-radius:var(--radius-input);
+  background:var(--bg);border:1px solid var(--border);color:var(--text);
+}
+textarea.input{resize:vertical;min-height:80px;}
+.input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);}
+.checkbox-row{display:flex;align-items:center;gap:8px;}
+.checkbox-group{display:flex;flex-wrap:wrap;gap:14px;}
+.checkbox-group label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);}
+.field-hint{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:100;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);width:100%;max-width:560px;padding:28px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
+
+/* ---------- Tabs / search ---------- */
+.tabbar{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;}
+.tab{padding:7px 14px;border-radius:var(--radius-btn);cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;border:1px solid transparent;}
+.tab.active{background:var(--card);color:var(--text);border-color:var(--border);}
+.searchbar{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+.searchbar .input{max-width:280px;}
+
+/* ---------- Project header ---------- */
+.project-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px;}
+.project-dot{width:14px;height:14px;border-radius:50%;background:var(--project-color,var(--accent));flex:none;}
+.project-title{font-size:22px;font-weight:600;}
+.menu-wrap{position:relative;display:inline-block;}
+.dropdown{position:absolute;right:0;top:calc(100% + 6px);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-btn);min-width:190px;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:50;overflow:hidden;}
+.dropdown-item{padding:9px 14px;font-size:13px;cursor:pointer;}
+.dropdown-item:hover{background:rgba(240,237,232,.06);}
+.dropdown-item.danger{color:var(--danger);}
+
+/* ---------- Block tiles ---------- */
+.block-tile{cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;transition:border-color .15s ease;}
+.block-tile:hover{border-color:var(--accent);}
+.block-tile-icon{width:40px;height:40px;border-radius:8px;background:rgba(143,175,143,.14);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;letter-spacing:.02em;}
+.block-tile-label{font-size:13.5px;font-weight:500;}
+
+/* ---------- Block list ---------- */
+.block-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+.block-row:last-child{border-bottom:none;}
+.block-row-main{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.block-row-title{font-weight:500;font-size:13.5px;}
+.block-row-date{color:var(--muted);font-size:12px;}
+.block-row-actions{display:flex;gap:8px;}
+
+/* ---------- Block editor ---------- */
+.block-editor-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.block-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media (max-width:860px){.block-editor-grid{grid-template-columns:1fr;}}
+.panel-title{font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.output-empty{color:var(--muted);font-size:13px;padding:24px 0;text-align:center;}
+.output-content{font-size:13.5px;line-height:1.65;}
+.output-content h1{font-size:18px;}
+.output-content h2{font-size:15.5px;margin-top:18px;}
+.output-content ul{padding-left:20px;margin:0 0 10px 0;}
+.variation-card{border:1px solid var(--border);border-radius:var(--radius-input);padding:12px 14px;margin-bottom:10px;}
+.variation-card .vlabel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+.variation-card .vtext{white-space:pre-wrap;}
+.review-panel{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;}
+.review-panel summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:500;}
+.review-block{margin-top:10px;padding:12px 14px;background:rgba(240,237,232,.04);border-radius:var(--radius-input);font-size:13px;white-space:pre-wrap;}
+.review-agent-label{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(240,237,232,.2);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.iframe-preview{width:100%;height:420px;border:1px solid var(--border);border-radius:var(--radius-input);background:#fff;}
+
+/* ---------- Toast ---------- */
+.toast-wrap{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:200;}
+.toast{background:var(--card);border:1px solid var(--border);padding:12px 16px;border-radius:var(--radius-btn);font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:320px;}
+.toast.error{border-color:var(--danger);color:#f0d3d0;}
+.toast.success{border-color:var(--accent);}
+
+/* ---------- Misc ---------- */
+.muted{color:var(--muted);}
+.text-right{text-align:right;}
+.flex{display:flex;}
+.flex-between{display:flex;align-items:center;justify-content:space-between;}
+.gap-8{gap:8px;}
+.gap-12{gap:12px;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.version-select{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius-btn);font-size:12.5px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+  // Kliens konfiguráció betöltése (lásd config.example.js). A config.js
+  // fájlt telepítéskor kell létrehozni – SOHA nem kerül verziókezelésbe.
+  if(!window.IDONYERO_CONFIG){
+    document.getElementById('app').innerHTML =
+      '<div style="max-width:560px;margin:80px auto;padding:0 20px;font-family:sans-serif;color:#F0EDE8;">' +
+      '<h2>Hiányzó konfiguráció</h2>' +
+      '<p>Hozz létre egy <code>config.js</code> fájlt az <code>index.html</code> mellé a ' +
+      '<code>config.example.js</code> alapján, és töltsd ki a Supabase projekt adataival.</p></div>';
+  }
+</script>
+<script src="config.js" onerror="console.warn('config.js nem található – lásd config.example.js')"></script>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import * as docx from 'https://esm.sh/docx@8.5.0';
+
+const CONFIG = window.IDONYERO_CONFIG || {};
+if(!CONFIG.SUPABASE_URL){
+  // A fenti inline script már megjelenítette a hibaüzenetet.
+  throw new Error('Missing config.js');
+}
+const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+/* ============================================================================
+ * KONSTANSOK
+ * ==========================================================================*/
+const PROJECT_COLORS = ['#C17A5A','#7A9E9F','#9B8BB4','#C4A35A','#7A9E7A','#B47A7A','#7A8FA6','#A67A9E'];
+const CHANNEL_OPTIONS = ['Meta','Google Ads','SEO','Email','Egyéb'];
+
+const CLIENT_STATUS_LABELS = { active:'Aktív', paused:'Szüneteltetett', archived:'Archivált', trash:'Kukában' };
+const BLOCK_STATUS_LABELS  = { draft:'Piszkozat', reviewing:'Jóváhagyásra vár', approved:'Jóváhagyva', delivered:'Leszállítva' };
+
+const BLOCK_TYPES = {
+  meta_copy: {
+    label:'Meta szövegírás', tag:'META', exportFormat:'copy', agentType:'meta_copywriter',
+    reviewAgents:['corrector'],
+    inputs:[
+      {key:'campaign_type', label:'Kampány típusa', type:'select', options:['Elérés','Konverzió','Lead generálás','Forgalom','Elköteleződés','Alkalmazás telepítés','Egyéb'], default:'Konverzió'},
+      {key:'target_audience', label:'Célközönség', type:'textarea', prefill:'client.target_audience'},
+      {key:'benefits', label:'Előnyök / USP-k', type:'textarea'},
+      {key:'cta', label:'CTA (call to action)', type:'text'},
+      {key:'use_emoji', label:'Emoji használata', type:'checkbox'},
+      {key:'variations', label:'Variációk száma', type:'number', default:3, min:1, max:6},
+    ],
+  },
+  ads_copy: {
+    label:'Google Ads szövegek', tag:'ADS', exportFormat:'copy', agentType:'ads_copywriter',
+    reviewAgents:['corrector'],
+    inputs:[
+      {key:'campaign_type', label:'Kampány típusa', type:'select', options:['Keresési hálózat','Display hálózat','Performance Max','Shopping','Egyéb'], default:'Keresési hálózat'},
+      {key:'keywords', label:'Kulcsszavak', type:'textarea', prefill:'context.keywords'},
+      {key:'usps', label:'USP-k / egyedi előnyök', type:'textarea'},
+      {key:'notes', label:'Egyéb megjegyzés', type:'textarea', hint:'Karakterszám-limitek: Headline 30, Long headline 90, Description 90 karakter.'},
+    ],
+  },
+  campaign_strategy: {
+    label:'Kampánystratégia', tag:'STRAT', exportFormat:'docx', agentType:'marketing_strategist',
+    reviewAgents:['data_reviewer'],
+    inputs:[
+      {key:'goal', label:'Ügyfél célja', type:'textarea'},
+      {key:'budget', label:'Büdzsé', type:'text'},
+      {key:'channels', label:'Csatornák', type:'textarea', prefill:'client.active_channels'},
+      {key:'period', label:'Időszak', type:'text'},
+      {key:'starting_point', label:'Kiindulási helyzet', type:'textarea'},
+    ],
+  },
+  campaign_optimization: {
+    label:'Kampányoptimalizálás', tag:'OPT', exportFormat:'docx', agentType:'data_analyst',
+    reviewAgents:['data_reviewer'],
+    inputs:[
+      {key:'campaign_data', label:'Kampány adatok (CSV vagy kézi adatok)', type:'csvfile'},
+      {key:'period', label:'Vizsgált időszak', type:'text'},
+    ],
+  },
+  landing_page: {
+    label:'Landing oldal', tag:'LP', exportFormat:'html', agentType:'web_developer',
+    reviewAgents:['code_reviewer','seo_reviewer','corrector'],
+    inputs:[
+      {key:'goal', label:'Kampány célja', type:'textarea'},
+      {key:'usps', label:'USP-k', type:'textarea'},
+      {key:'cta', label:'CTA szöveg', type:'text'},
+      {key:'color_preference', label:'Szín preferencia (opcionális)', type:'text', placeholder:'pl. #4A5E4A'},
+      {key:'sections', label:'Kívánt szekciók', type:'textarea', placeholder:'pl. Hero, Előnyök, Vélemények, CTA, Lábléc'},
+    ],
+  },
+  seo_audit: {
+    label:'SEO audit', tag:'SEO', exportFormat:'docx', agentType:'seo_specialist',
+    reviewAgents:['data_reviewer'],
+    inputs:[
+      {key:'url', label:'Weboldal URL', type:'text', prefill:'client.website'},
+      {key:'focus_keywords', label:'Fókusz kulcsszavak', type:'textarea', prefill:'context.keywords'},
+      {key:'competitors', label:'Versenytársak (opcionális)', type:'textarea', prefill:'context.competitors'},
+    ],
+  },
+  blog_post: {
+    label:'Blogcikk', tag:'BLOG', exportFormat:'docx', agentType:'blog_writer',
+    reviewAgents:['corrector','seo_reviewer'],
+    inputs:[
+      {key:'topic', label:'Téma', type:'text'},
+      {key:'focus_keyword', label:'Célkulcsszó', type:'text', prefill:'context.seoKeyword'},
+      {key:'length', label:'Hossz', type:'select', options:['Rövid (~500 szó)','Közepes (~1000 szó)','Hosszú (~1800 szó)'], default:'Közepes (~1000 szó)'},
+      {key:'tone', label:'Hangvétel', type:'text', prefill:'client.brand_voice'},
+    ],
+  },
+  competitor_analysis: {
+    label:'Versenytárs elemzés', tag:'VS', exportFormat:'docx', agentType:'competitor_analyst',
+    reviewAgents:['data_reviewer'],
+    inputs:[
+      {key:'competitor_urls', label:'Versenytársak URL-jei (soronként)', type:'textarea', prefill:'context.competitors'},
+      {key:'aspects', label:'Elemzési szempontok', type:'textarea', placeholder:'pl. árazás, pozicionálás, tartalom, UX'},
+    ],
+  },
+};
+const BLOCK_TYPE_ORDER = ['meta_copy','ads_copy','campaign_strategy','campaign_optimization','landing_page','seo_audit','blog_post','competitor_analysis'];
+
+const JSON_ONLY_INSTRUCTION = 'Válaszolj KIZÁRÓLAG egy érvényes JSON objektummal, kódblokk-jelölés (```) és bármilyen más szöveg nélkül. A JSON pontosan az alább megadott séma szerint épüljön fel.';
+
+const AGENT_PROMPTS = {
+  meta_copywriter: `Te egy tapasztalt magyar Meta (Facebook/Instagram) hirdetésszövegíró vagy, aki konverzióra optimalizált, természetes hangvételű hirdetésszövegeket ír. ${JSON_ONLY_INSTRUCTION}
+Séma: {"variations": [{"primary_text": "string", "headline": "string (max 40 karakter)", "description": "string (max 30 karakter)"}]}
+A "variations" tömb elemszáma egyezzen meg a kért variációk számával.`,
+
+  ads_copywriter: `Te egy tapasztalt magyar Google Ads szövegíró vagy, aki keresési kampányokhoz ír kulcsszó-releváns, karakterszám-limiteknek megfelelő szövegeket. ${JSON_ONLY_INSTRUCTION}
+Séma: {"headlines": ["string, max 30 karakter", "..."], "long_headlines": ["string, max 90 karakter", "..."], "descriptions": ["string, max 90 karakter", "..."]}
+Adj legalább 8 headline-t, 4 long headline-t és 4 description-t.`,
+
+  marketing_strategist: `Te egy tapasztalt magyar marketing stratéga vagy, aki adatvezérelt, végrehajtható kampányterveket készít. ${JSON_ONLY_INSTRUCTION}
+Séma: {"markdown": "string – teljes kampányterv Markdown formátumban, # és ## fejezetcímekkel (célzás, büdzsé elosztás, ütemezés, KPI-ok)"}`,
+
+  data_analyst: `Te egy tapasztalt magyar adatelemző vagy, aki kampányadatokat elemez, problémákat azonosít és konkrét, priorizált optimalizálási javaslatokat ad. ${JSON_ONLY_INSTRUCTION}
+Séma: {"markdown": "string – Markdown elemzés # és ## fejezetcímekkel: eredmények összefoglalása, azonosított problémák, konkrét javaslatok prioritás szerint"}`,
+
+  seo_specialist: `Te egy tapasztalt magyar SEO szakember vagy, aki technikai és tartalmi SEO auditokat, valamint kulcsszókutatást végez. ${JSON_ONLY_INSTRUCTION}
+Séma: {"markdown": "string – teljes audit Markdown formátumban: technikai audit, tartalmi audit, kulcsszó elemzés, priorizált javaslatlista", "keywords": ["azonosított kulcsszó1", "kulcsszó2", "..."]}`,
+
+  web_developer: `Te egy tapasztalt frontend fejlesztő és webdesigner vagy, aki önálló, letisztult, modern landing oldalakat készít tiszta HTML/CSS/JS-ben (egyetlen fájlban, külső könyvtárak nélkül, mobilbarát, akadálymentes). ${JSON_ONLY_INSTRUCTION}
+Séma: {"html": "string – teljes, önállóan futtatható HTML dokumentum <!DOCTYPE html>-tól </html>-ig, beágyazott <style> és <script> tagekkel"}
+A design legyen letisztult, whitespace-ben gazdag, és vegye figyelembe a megadott szín preferenciát, ha van.`,
+
+  blog_writer: `Te egy tapasztalt magyar tartalommarketing szövegíró vagy, aki SEO-optimalizált blogcikkeket ír. ${JSON_ONLY_INSTRUCTION}
+Séma: {"title": "string", "meta_description": "string (max 160 karakter)", "markdown": "string – teljes cikk Markdown formátumban, egy # H1 és több ## H2 fejezetcímmel"}`,
+
+  competitor_analyst: `Te egy tapasztalt magyar piac- és versenytárselemző vagy. ${JSON_ONLY_INSTRUCTION}
+Séma: {"markdown": "string – Markdown elemzés: versenytárs összehasonlítás, piaci pozicionálás, azonosított rések", "competitors": ["versenytárs neve1", "..."]}`,
+
+  onboarding: `Te az Időnyerő nevű AI marketing platform kutató agentje vagy. A feladatod egy új ügyfél publikus digitális lábnyomának feltérképezése a web_search és web_fetch eszközök segítségével. Végezd el az alábbi lépéseket:
+1. Térképezd fel az ügyfél weboldalát (tartalom, termékek/szolgáltatások, kulcsszavak, meta adatok).
+2. Általános Google keresés az ügyfél nevére (cikkek, sajtóanyagok, megemlítések, interjúk).
+3. Social média keresés (facebook.com, instagram.com, linkedin.com oldalak, publikus posztok, aktivitás).
+4. Vélemények keresése (Google értékelések, Trustpilot, fórumok, egyéb platformok).
+5. Sajtó és PR megjelenések keresése (cikkek, interjúk, díjak).
+6. Az összegyűjtött adatok alapján azonosítsd a legvalószínűbb versenytársakat iparág és kulcsszavak alapján.
+7. Csak PUBLIKUSAN elérhető adatokat használj – privát social média tartalmakhoz, hirdetéskezelő fiókokhoz nincs hozzáférésed, ezt ne is próbáld meg.
+${JSON_ONLY_INSTRUCTION}
+Séma: {"summary": "string – strukturált összefoglaló: digitális lábnyom, erősségek/gyengeségek", "keywords": ["kulcsszó1", "..."], "competitors": ["versenytárs1", "..."], "strengths": ["erősség1", "..."], "weaknesses": ["gyengeség1", "..."], "focus_areas": ["javasolt fókuszterület1", "..."]}
+A kutatás végeztével, az UTOLSÓ válaszodban add vissza KIZÁRÓLAG ezt a JSON objektumot.`,
+
+  corrector: `Te egy magyar nyelvi korrektor és stilisztikai lektor vagy. Ellenőrizd az alábbi marketing szöveget helyesírási, nyelvhelyességi és stilisztikai szempontból. Adj tömör, pontokba szedett visszajelzést magyarul: mit javítanál, és miért. Ha nincs hiba, jelezd ezt röviden. Ne írd újra a teljes szöveget, csak a konkrét észrevételeket add meg.`,
+
+  code_reviewer: `Te egy tapasztalt frontend kód ellenőrző vagy. Vizsgáld meg az alábbi HTML/CSS/JS kódot hibák, akadálymentességi problémák, mobilbarátság és biztonsági kockázatok (pl. nem escape-elt felhasználói input, inline script sérülékenységek) szempontjából. Adj tömör, pontokba szedett visszajelzést magyarul.`,
+
+  seo_reviewer: `Te egy SEO ellenőrző agent vagy. Vizsgáld meg az alábbi tartalmat SEO szempontból: kulcsszóhasználat, címstruktúra, meta adatok, olvashatóság. Adj tömör, pontokba szedett visszajelzést magyarul.`,
+
+  data_reviewer: `Te egy adatelemző ellenőrző agent vagy. Vizsgáld meg az alábbi stratégiai/elemzési anyagot logikai konzisztencia, számszerű megalapozottság és megvalósíthatóság szempontjából. Adj tömör, pontokba szedett visszajelzést magyarul.`,
+};
+
+/* ============================================================================
+ * ÁLTALÁNOS SEGÉDFÜGGVÉNYEK
+ * ==========================================================================*/
+function escapeHtml(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function el(html){
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+function formatDate(iso){
+  if(!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleDateString('hu-HU', {year:'numeric', month:'short', day:'numeric'});
+}
+function toast(message, type){
+  const wrap = document.getElementById('toastWrap');
+  const node = el(`<div class="toast ${type==='error'?'error':(type==='success'?'success':'')}">${escapeHtml(message)}</div>`);
+  wrap.appendChild(node);
+  setTimeout(()=>node.remove(), 4500);
+}
+function colorForIndex(i){ return PROJECT_COLORS[i % PROJECT_COLORS.length]; }
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(()=>toast('Vágólapra másolva', 'success')).catch(()=>toast('Másolás sikertelen', 'error'));
+}
+function extractJson(text){
+  if(!text) return null;
+  let t = text.trim();
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if(fence) t = fence[1].trim();
+  try { return JSON.parse(t); } catch(e){}
+  const start = t.indexOf('{'), end = t.lastIndexOf('}');
+  if(start >= 0 && end > start){
+    try { return JSON.parse(t.slice(start, end+1)); } catch(e){}
+  }
+  return null;
+}
+function renderMarkdown(md){
+  if(!md) return '';
+  const lines = String(md).split(/\r?\n/);
+  let html = '', inList = false;
+  for(const raw of lines){
+    const line = raw.trim();
+    if(!line){ if(inList){html+='</ul>'; inList=false;} continue; }
+    let m;
+    if((m = line.match(/^###\s+(.*)/))){ if(inList){html+='</ul>';inList=false;} html += `<h3>${inlineMd(m[1])}</h3>`; }
+    else if((m = line.match(/^##\s+(.*)/))){ if(inList){html+='</ul>';inList=false;} html += `<h2>${inlineMd(m[1])}</h2>`; }
+    else if((m = line.match(/^#\s+(.*)/))){ if(inList){html+='</ul>';inList=false;} html += `<h1>${inlineMd(m[1])}</h1>`; }
+    else if((m = line.match(/^[-*]\s+(.*)/))){ if(!inList){html+='<ul>';inList=true;} html += `<li>${inlineMd(m[1])}</li>`; }
+    else { if(inList){html+='</ul>';inList=false;} html += `<p>${inlineMd(line)}</p>`; }
+  }
+  if(inList) html += '</ul>';
+  return html;
+}
+function inlineMd(s){
+  let t = escapeHtml(s);
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return t;
+}
+function getPath(obj, path){
+  return path.split('.').reduce((acc,k)=> (acc==null? undefined : acc[k]), obj);
+}
+
+/* ============================================================================
+ * ADATBÁZIS-RÉTEG (Supabase)
+ * ==========================================================================*/
+const DB = {
+  async listClients(){
+    const { data, error } = await supabase.from('clients').select('*').order('created_at', {ascending:false});
+    if(error) throw error;
+    return data || [];
+  },
+  async getClient(id){
+    const { data, error } = await supabase.from('clients').select('*').eq('id', id).single();
+    if(error) throw error;
+    return data;
+  },
+  async createClient(payload){
+    const { data, error } = await supabase.from('clients').insert(payload).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async updateClient(id, payload){
+    const { data, error } = await supabase.from('clients').update(payload).eq('id', id).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async deleteClient(id){
+    const { error } = await supabase.from('clients').delete().eq('id', id);
+    if(error) throw error;
+  },
+  async getProjectContext(clientId){
+    const { data, error } = await supabase.from('project_context').select('*').eq('client_id', clientId).order('created_at', {ascending:false}).limit(1);
+    if(error) throw error;
+    return (data && data[0]) || null;
+  },
+  async createProjectContext(payload){
+    const { data, error } = await supabase.from('project_context').insert(payload).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async listBlocks(clientId){
+    const { data, error } = await supabase.from('blocks').select('*').eq('client_id', clientId).order('created_at', {ascending:false});
+    if(error) throw error;
+    return data || [];
+  },
+  async getBlock(id){
+    const { data, error } = await supabase.from('blocks').select('*').eq('id', id).single();
+    if(error) throw error;
+    return data;
+  },
+  async createBlock(payload){
+    const { data, error } = await supabase.from('blocks').insert(payload).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async updateBlock(id, payload){
+    const { data, error } = await supabase.from('blocks').update(payload).eq('id', id).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async listVersions(blockId){
+    const { data, error } = await supabase.from('block_versions').select('*').eq('block_id', blockId).order('version_number', {ascending:false});
+    if(error) throw error;
+    return data || [];
+  },
+  async createVersion(blockId, versionNumber, content, note){
+    const { data, error } = await supabase.from('block_versions').insert({ block_id: blockId, version_number: versionNumber, content, note: note || null }).select().single();
+    if(error) throw error;
+    return data;
+  },
+  async createAgentOutput(blockId, agentType, input, output){
+    const { error } = await supabase.from('agent_outputs').insert({ block_id: blockId, agent_type: agentType, input, output });
+    if(error) throw error;
+  },
+  async listAgentOutputs(blockId){
+    const { data, error } = await supabase.from('agent_outputs').select('*').eq('block_id', blockId).order('ran_at', {ascending:true});
+    if(error) throw error;
+    return data || [];
+  },
+};
+
+/* ============================================================================
+ * CLAUDE API HÍVÁS (a Supabase Edge Function proxyn keresztül)
+ * ==========================================================================*/
+async function callClaude({ system, userContent, tools, max_tokens }){
+  if(!CONFIG.CLAUDE_PROXY_URL){
+    throw new Error('CLAUDE_PROXY_URL nincs beállítva a config.js-ben.');
+  }
+  let messages = [{ role:'user', content: userContent }];
+  let finalData = null;
+  for(let i=0; i<4; i++){
+    const res = await fetch(CONFIG.CLAUDE_PROXY_URL, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ system, messages, tools, max_tokens: max_tokens || 4000 }),
+    });
+    const data = await res.json();
+    if(!res.ok){
+      throw new Error((data && (data.error?.message || data.error)) || 'Claude API hívás sikertelen');
+    }
+    finalData = data;
+    if(data.stop_reason === 'pause_turn'){
+      messages = messages.concat([{ role:'assistant', content: data.content }]);
+      continue;
+    }
+    break;
+  }
+  const textBlocks = (finalData.content || []).filter(b=>b.type==='text').map(b=>b.text);
+  return { raw: finalData, text: textBlocks.join('\n\n') };
+}
+
+function buildSystemPrompt(agentType, context){
+  const base = AGENT_PROMPTS[agentType] || '';
+  if(!context) return base;
+  return `${base}
+
+## ÜGYFÉL KONTEXTUS
+Ügyfél: ${context.client?.name || '-'}
+Iparág: ${context.client?.industry || '-'}
+Célcsoport: ${context.client?.target_audience || '-'}
+Brand voice: ${context.client?.brand_voice || '-'}
+Weboldal összefoglaló: ${context.summary || '-'}
+Kulcsszavak: ${(context.keywords||[]).join(', ') || '-'}
+Versenytársak: ${(context.competitors||[]).join(', ') || '-'}
+Korábbi blokkok: ${context.previousBlocksText || '-'}`;
+}
+
+/* ============================================================================
+ * EXPORT: docx / html / copy
+ * ==========================================================================*/
+async function exportMarkdownAsDocx(filename, title, markdown, metaDescription){
+  const children = [ new docx.Paragraph({ text: title || 'Időnyerő dokumentum', heading: docx.HeadingLevel.TITLE }) ];
+  if(metaDescription){
+    children.push(new docx.Paragraph({ children:[ new docx.TextRun({ text:'Meta leírás: '+metaDescription, italics:true }) ] }));
+  }
+  const lines = String(markdown||'').split(/\r?\n/);
+  for(const raw of lines){
+    const line = raw.trim();
+    if(!line){ children.push(new docx.Paragraph({ text:'' })); continue; }
+    if(line.startsWith('## ')) children.push(new docx.Paragraph({ text: line.slice(3), heading: docx.HeadingLevel.HEADING_2 }));
+    else if(line.startsWith('### ')) children.push(new docx.Paragraph({ text: line.slice(4), heading: docx.HeadingLevel.HEADING_3 }));
+    else if(line.startsWith('# ')) children.push(new docx.Paragraph({ text: line.slice(2), heading: docx.HeadingLevel.HEADING_1 }));
+    else if(line.startsWith('- ') || line.startsWith('* ')) children.push(new docx.Paragraph({ text: line.slice(2), bullet:{ level:0 } }));
+    else children.push(new docx.Paragraph({ text: line }));
+  }
+  const document = new docx.Document({ sections:[{ children }] });
+  const blob = await docx.Packer.toBlob(document);
+  downloadBlob(blob, filename + '.docx');
+}
+function exportHtmlFile(filename, htmlContent){
+  const blob = new Blob([htmlContent || ''], { type:'text/html' });
+  downloadBlob(blob, filename + '.html');
+}
+
+/* ============================================================================
+ * ROUTER
+ * ==========================================================================*/
+const app = document.getElementById('app');
+
+function parseHash(){
+  const raw = location.hash.replace(/^#\/?/, '');
+  const [pathPart, queryPart] = raw.split('?');
+  const parts = pathPart.split('/').filter(Boolean).map(decodeURIComponent);
+  const query = new URLSearchParams(queryPart || '');
+  return { parts, query };
+}
+function navigate(hash){ location.hash = hash; }
+
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+
+async function route(){
+  const { parts, query } = parseHash();
+  try{
+    if(parts.length === 0){ await renderDashboard(); return; }
+    if(parts[0] === 'standalone' && parts.length === 1){ await renderBlockPicker(null); return; }
+    if(parts[0] === 'standalone' && parts.length === 2){ await renderBlockEditor(null, parts[1], query.get('id')); return; }
+    if(parts[0] === 'client' && parts.length === 2){ await renderProjectView(parts[1]); return; }
+    if(parts[0] === 'client' && parts.length === 3 && parts[2] === 'edit'){ await renderClientEdit(parts[1]); return; }
+    if(parts[0] === 'client' && parts.length === 4 && parts[2] === 'block'){ await renderBlockEditor(parts[1], parts[3], query.get('id')); return; }
+    await renderDashboard();
+  } catch(err){
+    console.error(err);
+    app.innerHTML = `<div class="container page"><div class="card"><h2>Hiba történt</h2><p class="muted">${escapeHtml(err.message||String(err))}</p></div></div>`;
+  }
+}
+
+function renderTopnav(activeKey){
+  return `
+  <div class="topnav"><div class="container topnav-inner">
+    <div class="brand" data-nav="#/"><span class="brand-mark">🪄</span> Időnyerő</div>
+    <div class="nav-links">
+      <div class="nav-link ${activeKey==='dashboard'?'active':''}" data-nav="#/">Vezérlőpult</div>
+      <div class="nav-link ${activeKey==='standalone'?'active':''}" data-nav="#/standalone">Gyors blokk</div>
+    </div>
+  </div></div>`;
+}
+function wireNav(root){
+  root.querySelectorAll('[data-nav]').forEach(node=>{
+    node.addEventListener('click', ()=> navigate(node.getAttribute('data-nav')));
+  });
+}
+
+/* ============================================================================
+ * DASHBOARD
+ * ==========================================================================*/
+let dashboardState = { tab:'active', search:'' };
+
+async function renderDashboard(){
+  app.innerHTML = renderTopnav('dashboard') + `<div class="container page" id="pageBody"><div class="empty-state">Betöltés…</div></div>`;
+  wireNav(app);
+
+  await cleanupExpiredTrash();
+  const clients = await DB.listClients();
+  drawDashboard(clients);
+}
+
+async function cleanupExpiredTrash(){
+  try{
+    const all = await DB.listClients();
+    const cutoff = Date.now() - 30*24*60*60*1000;
+    const toDelete = all.filter(c=> c.status==='trash' && c.trashed_at && new Date(c.trashed_at).getTime() < cutoff);
+    for(const c of toDelete){ await DB.deleteClient(c.id); }
+  } catch(e){ console.warn('Trash cleanup failed', e); }
+}
+
+function drawDashboard(allClients){
+  const body = document.getElementById('pageBody');
+  const filtered = allClients.filter(c => c.status === dashboardState.tab &&
+    (!dashboardState.search || c.name.toLowerCase().includes(dashboardState.search.toLowerCase())));
+  const starred = filtered.filter(c=>c.starred);
+  const rest = filtered.filter(c=>!c.starred);
+
+  function cardHtml(c){
+    const idx = allClients.indexOf(c);
+    return `
+    <div class="card client-card" style="--project-color:${c.color || colorForIndex(idx)}" data-client="${c.id}">
+      <div class="client-card-top">
+        <div>
+          <div class="client-card-name">${escapeHtml(c.name)}</div>
+          <div class="client-card-industry">${escapeHtml(c.industry||'')}</div>
+        </div>
+        <button class="star-btn ${c.starred?'starred':''}" data-star="${c.id}" data-starred="${c.starred}" title="Kedvenc">★</button>
+      </div>
+      <div class="client-card-meta">
+        <span class="badge badge-${c.status}">${CLIENT_STATUS_LABELS[c.status]}</span>
+        ${(c.active_channels||[]).slice(0,3).map(ch=>`<span class="chip">${escapeHtml(ch)}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  body.innerHTML = `
+    <div class="page-header">
+      <h1>Ügyfelek</h1>
+      <button class="btn btn-primary" id="btnNewClient">+ Új ügyfél</button>
+    </div>
+    <div class="searchbar">
+      <input class="input" id="searchInput" placeholder="Keresés ügyfél neve alapján…" value="${escapeHtml(dashboardState.search)}">
+    </div>
+    <div class="tabbar">
+      ${['active','paused','archived','trash'].map(k=>`<div class="tab ${dashboardState.tab===k?'active':''}" data-tab="${k}">${CLIENT_STATUS_LABELS[k]}</div>`).join('')}
+    </div>
+    ${starred.length ? `<div class="section-title">Kiemelt</div><div class="grid grid-clients">${starred.map(cardHtml).join('')}</div>` : ''}
+    <div class="section-title">${starred.length? 'Egyéb' : CLIENT_STATUS_LABELS[dashboardState.tab]}</div>
+    ${rest.length ? `<div class="grid grid-clients">${rest.map(cardHtml).join('')}</div>` : (starred.length? '' : `<div class="empty-state">Nincs ide tartozó ügyfél.</div>`)}
+  `;
+
+  body.querySelector('#btnNewClient').addEventListener('click', openNewClientModal);
+  body.querySelector('#searchInput').addEventListener('input', (e)=>{ dashboardState.search = e.target.value; drawDashboard(allClients); });
+  body.querySelectorAll('[data-tab]').forEach(t=> t.addEventListener('click', ()=>{ dashboardState.tab = t.getAttribute('data-tab'); drawDashboard(allClients); }));
+  body.querySelectorAll('[data-client]').forEach(c=> c.addEventListener('click', (e)=>{
+    if(e.target.closest('[data-star]')) return;
+    navigate('#/client/' + c.getAttribute('data-client'));
+  }));
+  body.querySelectorAll('[data-star]').forEach(btn=> btn.addEventListener('click', async (e)=>{
+    e.stopPropagation();
+    const id = btn.getAttribute('data-star');
+    const starred = btn.getAttribute('data-starred') === 'true';
+    await DB.updateClient(id, { starred: !starred });
+    const updated = await DB.listClients();
+    drawDashboard(updated);
+  }));
+}
+
+function openNewClientModal(){
+  const overlay = el(`
+  <div class="overlay">
+    <div class="modal">
+      <div class="modal-header"><h2>Új ügyfél</h2><button class="modal-close" data-close>&times;</button></div>
+      <form id="newClientForm">
+        <div class="field"><label>Ügyfél neve *</label><input class="input" name="name" required></div>
+        <div class="field"><label>Iparág *</label><input class="input" name="industry" required></div>
+        <div class="field"><label>Weboldal URL *</label><input class="input" name="website" required placeholder="https://"></div>
+        <div class="field"><label>Célcsoport leírása</label><textarea class="input" name="target_audience"></textarea></div>
+        <div class="field"><label>Brand voice</label><input class="input" name="brand_voice" placeholder="pl. szakmai de barátságos"></div>
+        <div class="field"><label>Aktív hirdetési csatornák</label>
+          <div class="checkbox-group">
+            ${CHANNEL_OPTIONS.map(ch=>`<label><input type="checkbox" name="channel" value="${ch}"> ${ch}</label>`).join('')}
+          </div>
+        </div>
+        <div class="field"><label>Megjegyzések</label><textarea class="input" name="notes"></textarea></div>
+        <div class="flex-between gap-8">
+          <button type="button" class="btn btn-ghost" data-close>Mégse</button>
+          <button type="submit" class="btn btn-primary">Projekt kezdése</button>
+        </div>
+      </form>
+    </div>
+  </div>`);
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', ()=>overlay.remove()));
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.remove(); });
+
+  overlay.querySelector('#newClientForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const channels = fd.getAll('channel');
+    const submitBtn = e.target.querySelector('button[type=submit]');
+    submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner"></span> Létrehozás…';
+    try{
+      const clients = await DB.listClients();
+      const client = await DB.createClient({
+        name: fd.get('name'), industry: fd.get('industry'), website: fd.get('website'),
+        target_audience: fd.get('target_audience') || null, brand_voice: fd.get('brand_voice') || null,
+        active_channels: channels, notes: fd.get('notes') || null,
+        color: colorForIndex(clients.length), status:'active',
+      });
+      overlay.remove();
+      navigate('#/client/' + client.id);
+      runOnboarding(client);
+    } catch(err){
+      toast(err.message || 'Hiba történt a létrehozáskor', 'error');
+      submitBtn.disabled = false; submitBtn.textContent = 'Projekt kezdése';
+    }
+  });
+}
+
+/* ============================================================================
+ * ONBOARDING – projekt kontextus AI feltöltés
+ * ==========================================================================*/
+const onboardingInProgress = new Set();
+
+async function runOnboarding(client){
+  onboardingInProgress.add(client.id);
+  try{
+    const userMsg = `Ügyfél neve: ${client.name}\nIparág: ${client.industry}\nWeboldal: ${client.website}\nCélcsoport: ${client.target_audience||'-'}\n\nVégezd el a teljes publikus digitális lábnyom kutatást a rendszerpromptban leírt lépések szerint, majd add vissza a JSON összefoglalót.`;
+    const { text } = await callClaude({
+      system: AGENT_PROMPTS.onboarding,
+      userContent: userMsg,
+      tools: [
+        { type:'web_search_20260209', name:'web_search' },
+        { type:'web_fetch_20260209', name:'web_fetch' },
+      ],
+      max_tokens: 8000,
+    });
+    const parsed = extractJson(text) || { summary: text, keywords:[], competitors:[], strengths:[], weaknesses:[], focus_areas:[] };
+    await DB.createProjectContext({
+      client_id: client.id,
+      scraped_data: null,
+      summary: parsed.summary || '',
+      keywords: parsed.keywords || [],
+      competitors: parsed.competitors || [],
+      strengths: parsed.strengths || [],
+      weaknesses: parsed.weaknesses || [],
+      focus_areas: parsed.focus_areas || [],
+    });
+    toast('Projekt kontextus elkészült: ' + client.name, 'success');
+  } catch(err){
+    console.error(err);
+    toast('Kontextus gyűjtés sikertelen: ' + (err.message||err), 'error');
+  } finally{
+    onboardingInProgress.delete(client.id);
+    const { parts } = parseHash();
+    if(parts[0]==='client' && parts[1]===client.id && parts.length===2){ await renderProjectView(client.id); }
+  }
+}
+
+/* ============================================================================
+ * PROJEKT NÉZET
+ * ==========================================================================*/
+async function gatherContext(client){
+  const ctx = await DB.getProjectContext(client.id);
+  const blocks = await DB.listBlocks(client.id);
+  const doneBlocks = blocks.filter(b=>b.content);
+  const previousBlocksText = doneBlocks.slice(0,8).map(b=> `${BLOCK_TYPES[b.type]?.label||b.type} (${formatDate(b.created_at)})`).join('; ');
+  const seoAudit = doneBlocks.find(b=>b.type==='seo_audit');
+  const seoKeywords = (seoAudit && seoAudit.content && seoAudit.content.keywords) || (ctx && ctx.keywords) || [];
+  return {
+    client, summary: ctx?.summary || '', keywords: ctx?.keywords || [], competitors: ctx?.competitors || [],
+    strengths: ctx?.strengths || [], weaknesses: ctx?.weaknesses || [], focus_areas: ctx?.focus_areas || [],
+    previousBlocksText, seoKeywords, blocks, hasContext: !!ctx,
+  };
+}
+
+async function renderProjectView(clientId){
+  app.innerHTML = renderTopnav(null) + `<div class="container page" id="pageBody"><div class="empty-state">Betöltés…</div></div>`;
+  wireNav(app);
+  const client = await DB.getClient(clientId);
+  const context = await gatherContext(client);
+  drawProjectView(client, context);
+}
+
+function statusMenuHtml(client){
+  const items = [];
+  if(client.status !== 'trash'){
+    if(client.status !== 'active') items.push({k:'active', label:'Aktiválás'});
+    if(client.status !== 'paused') items.push({k:'paused', label:'Szüneteltetés'});
+    if(client.status !== 'archived') items.push({k:'archived', label:'Archiválás'});
+    items.push({k:'trash', label:'Kukába helyezés', danger:true});
+  } else {
+    items.push({k:'active', label:'Visszaállítás'});
+    items.push({k:'__delete', label:'Végleges törlés', danger:true});
+  }
+  return items.map(i=>`<div class="dropdown-item ${i.danger?'danger':''}" data-status="${i.k}">${i.label}</div>`).join('');
+}
+
+function drawProjectView(client, context){
+  const body = document.getElementById('pageBody');
+  const blocks = context.blocks;
+  body.innerHTML = `
+    <div class="project-header">
+      <div class="project-dot" style="--project-color:${client.color||'#8FAF8F'}"></div>
+      <div class="project-title">${escapeHtml(client.name)}</div>
+      <span class="badge badge-${client.status}">${CLIENT_STATUS_LABELS[client.status]}</span>
+      <button class="star-btn ${client.starred?'starred':''}" id="starBtn">★</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-ghost btn-sm" id="editBtn">Adatlap szerkesztése</button>
+      <div class="menu-wrap">
+        <button class="btn btn-ghost btn-sm" id="menuBtn">⋯</button>
+        <div class="dropdown" id="statusDropdown" style="display:none;">${statusMenuHtml(client)}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <div class="flex-between">
+        <div class="panel-title">Projekt összefoglaló</div>
+        <button class="btn btn-ghost btn-sm" id="regenBtn">${context.hasContext ? 'Újragenerálás' : 'Kontextus gyűjtése'}</button>
+      </div>
+      ${onboardingInProgress.has(client.id)
+        ? `<div class="flex gap-8"><span class="spinner"></span> Kontextus gyűjtése folyamatban – ez néhány percet is igénybe vehet…</div>`
+        : (context.hasContext
+          ? `<p>${escapeHtml(context.summary)}</p>
+             ${context.keywords.length? `<div class="small-label">Kulcsszavak</div><div class="client-card-meta">${context.keywords.map(k=>`<span class="chip">${escapeHtml(k)}</span>`).join('')}</div>`:''}
+             ${context.competitors.length? `<div class="small-label" style="margin-top:10px;">Versenytársak</div><div class="client-card-meta">${context.competitors.map(k=>`<span class="chip">${escapeHtml(k)}</span>`).join('')}</div>`:''}
+             ${context.focus_areas.length? `<div class="small-label" style="margin-top:10px;">Javasolt fókuszterületek</div><ul>${context.focus_areas.map(f=>`<li>${escapeHtml(f)}</li>`).join('')}</ul>`:''}`
+          : `<p class="muted">Még nincs projekt kontextus. Kattints a "Kontextus gyűjtése" gombra az automatikus kutatás elindításához.</p>`)}
+    </div>
+
+    <div class="section-title">Blokkok</div>
+    <div class="grid grid-blocks" style="margin-bottom:28px;">
+      ${BLOCK_TYPE_ORDER.map(t=>`
+        <div class="card block-tile" data-newblock="${t}">
+          <div class="block-tile-icon">${BLOCK_TYPES[t].tag}</div>
+          <div class="block-tile-label">${BLOCK_TYPES[t].label}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="section-title">Korábbi blokkok</div>
+    <div class="card">
+      ${blocks.length ? blocks.map(b=>`
+        <div class="block-row">
+          <div class="block-row-main">
+            <span class="badge">${BLOCK_TYPES[b.type]?.label||b.type}</span>
+            <span class="badge badge-${b.status}">${BLOCK_STATUS_LABELS[b.status]}</span>
+            <span class="block-row-date">${formatDate(b.created_at)}</span>
+          </div>
+          <div class="block-row-actions">
+            <button class="btn btn-ghost btn-sm" data-openblock="${b.id}" data-type="${b.type}">Megnyitás</button>
+          </div>
+        </div>`).join('') : `<div class="empty-state">Még nincs blokk ehhez a projekthez.</div>`}
+    </div>
+  `;
+
+  body.querySelector('#starBtn').addEventListener('click', async ()=>{
+    await DB.updateClient(client.id, { starred: !client.starred });
+    renderProjectView(client.id);
+  });
+  body.querySelector('#editBtn').addEventListener('click', ()=> navigate(`#/client/${client.id}/edit`));
+  body.querySelector('#menuBtn').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const dd = body.querySelector('#statusDropdown');
+    dd.style.display = dd.style.display==='none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', ()=>{ const dd = body.querySelector('#statusDropdown'); if(dd) dd.style.display='none'; }, { once:true });
+  body.querySelectorAll('[data-status]').forEach(item=> item.addEventListener('click', async ()=>{
+    const k = item.getAttribute('data-status');
+    if(k === '__delete'){
+      if(confirm('Biztosan véglegesen törlöd az ügyfelet? Ez nem visszavonható.')){
+        await DB.deleteClient(client.id);
+        navigate('#/');
+      }
+      return;
+    }
+    const payload = { status:k };
+    if(k === 'trash') payload.trashed_at = new Date().toISOString();
+    await DB.updateClient(client.id, payload);
+    if(k === 'trash') navigate('#/'); else renderProjectView(client.id);
+  }));
+  body.querySelector('#regenBtn').addEventListener('click', ()=>{
+    if(onboardingInProgress.has(client.id)) return;
+    runOnboarding(client); // szinkron rész (Set.add) lefut, mielőtt a redraw megtörténik
+    renderProjectView(client.id);
+  });
+  body.querySelectorAll('[data-newblock]').forEach(t=> t.addEventListener('click', async ()=>{
+    const type = t.getAttribute('data-newblock');
+    const block = await DB.createBlock({ client_id: client.id, type, title: BLOCK_TYPES[type].label, status:'draft', content:null, input:null, export_format: BLOCK_TYPES[type].exportFormat, standalone:false });
+    navigate(`#/client/${client.id}/block/${type}?id=${block.id}`);
+  }));
+  body.querySelectorAll('[data-openblock]').forEach(t=> t.addEventListener('click', ()=>{
+    navigate(`#/client/${client.id}/block/${t.getAttribute('data-type')}?id=${t.getAttribute('data-openblock')}`);
+  }));
+}
+
+/* ============================================================================
+ * ÜGYFÉL SZERKESZTÉSE
+ * ==========================================================================*/
+async function renderClientEdit(clientId){
+  app.innerHTML = renderTopnav(null) + `<div class="container page" id="pageBody"></div>`;
+  wireNav(app);
+  const client = await DB.getClient(clientId);
+  const body = document.getElementById('pageBody');
+  body.innerHTML = `
+    <div class="page-header"><h1>Adatlap szerkesztése – ${escapeHtml(client.name)}</h1></div>
+    <div class="card" style="max-width:560px;">
+      <form id="editForm">
+        <div class="field"><label>Ügyfél neve *</label><input class="input" name="name" required value="${escapeHtml(client.name)}"></div>
+        <div class="field"><label>Iparág *</label><input class="input" name="industry" required value="${escapeHtml(client.industry||'')}"></div>
+        <div class="field"><label>Weboldal URL *</label><input class="input" name="website" required value="${escapeHtml(client.website||'')}"></div>
+        <div class="field"><label>Célcsoport leírása</label><textarea class="input" name="target_audience">${escapeHtml(client.target_audience||'')}</textarea></div>
+        <div class="field"><label>Brand voice</label><input class="input" name="brand_voice" value="${escapeHtml(client.brand_voice||'')}"></div>
+        <div class="field"><label>Aktív hirdetési csatornák</label>
+          <div class="checkbox-group">
+            ${CHANNEL_OPTIONS.map(ch=>`<label><input type="checkbox" name="channel" value="${ch}" ${(client.active_channels||[]).includes(ch)?'checked':''}> ${ch}</label>`).join('')}
+          </div>
+        </div>
+        <div class="field"><label>Megjegyzések</label><textarea class="input" name="notes">${escapeHtml(client.notes||'')}</textarea></div>
+        <div class="flex-between gap-8">
+          <button type="button" class="btn btn-ghost" id="backBtn">Vissza</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+      </form>
+    </div>
+  `;
+  body.querySelector('#backBtn').addEventListener('click', ()=> navigate(`#/client/${client.id}`));
+  body.querySelector('#editForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    await DB.updateClient(client.id, {
+      name: fd.get('name'), industry: fd.get('industry'), website: fd.get('website'),
+      target_audience: fd.get('target_audience')||null, brand_voice: fd.get('brand_voice')||null,
+      active_channels: fd.getAll('channel'), notes: fd.get('notes')||null,
+    });
+    toast('Mentve', 'success');
+    navigate(`#/client/${client.id}`);
+  });
+}
+
+/* ============================================================================
+ * STANDALONE BLOKK-VÁLASZTÓ
+ * ==========================================================================*/
+async function renderBlockPicker(){
+  app.innerHTML = renderTopnav('standalone') + `<div class="container page" id="pageBody"></div>`;
+  wireNav(app);
+  const body = document.getElementById('pageBody');
+  body.innerHTML = `
+    <div class="page-header"><h1>Gyors blokk</h1></div>
+    <p class="muted">Önálló blokk létrehozása ügyfél / projekt kontextus nélkül.</p>
+    <div class="grid grid-blocks" style="margin-top:20px;">
+      ${BLOCK_TYPE_ORDER.map(t=>`
+        <div class="card block-tile" data-newblock="${t}">
+          <div class="block-tile-icon">${BLOCK_TYPES[t].tag}</div>
+          <div class="block-tile-label">${BLOCK_TYPES[t].label}</div>
+        </div>`).join('')}
+    </div>
+  `;
+  body.querySelectorAll('[data-newblock]').forEach(t=> t.addEventListener('click', async ()=>{
+    const type = t.getAttribute('data-newblock');
+    const block = await DB.createBlock({ client_id: null, type, title: BLOCK_TYPES[type].label, status:'draft', content:null, input:null, export_format: BLOCK_TYPES[type].exportFormat, standalone:true });
+    navigate(`#/standalone/${type}?id=${block.id}`);
+  }));
+}
+
+/* ============================================================================
+ * BLOKK SZERKESZTŐ / NÉZET (közös, konfiguráció-vezérelt)
+ * ==========================================================================*/
+async function renderBlockEditor(clientId, blockType, blockId){
+  app.innerHTML = renderTopnav(clientId ? null : 'standalone') + `<div class="container page" id="pageBody"><div class="empty-state">Betöltés…</div></div>`;
+  wireNav(app);
+
+  let client = null, context = null;
+  if(clientId){
+    client = await DB.getClient(clientId);
+    context = await gatherContext(client);
+  }
+  const block = await DB.getBlock(blockId);
+  const versions = await DB.listVersions(blockId);
+  const agentOutputs = await DB.listAgentOutputs(blockId);
+  drawBlockEditor({ clientId, client, context, blockType, block, versions, agentOutputs, viewingVersion:null, generating:false });
+}
+
+function resolvePrefill(prefillPath, client, context){
+  if(!prefillPath) return '';
+  if(prefillPath.startsWith('client.')){
+    const v = client ? getPath(client, prefillPath.slice(7)) : null;
+    return Array.isArray(v) ? v.join(', ') : (v||'');
+  }
+  if(prefillPath === 'context.keywords') return context ? (context.keywords||[]).join(', ') : '';
+  if(prefillPath === 'context.competitors') return context ? (context.competitors||[]).join('\n') : '';
+  if(prefillPath === 'context.seoKeyword') return context && context.seoKeywords && context.seoKeywords[0] ? context.seoKeywords[0] : '';
+  return '';
+}
+
+function inputFieldHtml(field, value){
+  const id = 'f_' + field.key;
+  if(field.type === 'select'){
+    return `<div class="field"><label>${field.label}</label>
+      <select class="input" id="${id}" name="${field.key}">
+        ${field.options.map(o=>`<option value="${escapeHtml(o)}" ${value===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}
+      </select></div>`;
+  }
+  if(field.type === 'checkbox'){
+    return `<div class="field checkbox-row"><input type="checkbox" id="${id}" name="${field.key}" ${value?'checked':''}> <label for="${id}" style="margin:0;">${field.label}</label></div>`;
+  }
+  if(field.type === 'number'){
+    return `<div class="field"><label>${field.label}</label><input type="number" class="input" id="${id}" name="${field.key}" value="${value!=null?value:(field.default||'')}" min="${field.min||''}" max="${field.max||''}"></div>`;
+  }
+  if(field.type === 'textarea'){
+    return `<div class="field"><label>${field.label}</label><textarea class="input" id="${id}" name="${field.key}" placeholder="${escapeHtml(field.placeholder||'')}">${escapeHtml(value||'')}</textarea>${field.hint?`<div class="field-hint">${escapeHtml(field.hint)}</div>`:''}</div>`;
+  }
+  if(field.type === 'csvfile'){
+    return `<div class="field"><label>${field.label}</label>
+      <input type="file" class="input" id="${id}_file" accept=".csv,text/csv">
+      <textarea class="input" id="${id}" name="${field.key}" style="margin-top:8px;" placeholder="…vagy illeszd be kézzel az adatokat">${escapeHtml(value||'')}</textarea>
+    </div>`;
+  }
+  return `<div class="field"><label>${field.label}</label><input class="input" id="${id}" name="${field.key}" placeholder="${escapeHtml(field.placeholder||'')}" value="${escapeHtml(value||'')}"></div>`;
+}
+
+function renderOutputContent(type, content){
+  if(!content) return `<div class="output-empty">Még nincs generált tartalom. Töltsd ki a bal oldali mezőket, majd kattints a Generálás gombra.</div>`;
+  if(type === 'meta_copy'){
+    return (content.variations||[]).map((v,i)=>`
+      <div class="variation-card">
+        <div class="vlabel">Variáció ${i+1}</div>
+        <div class="vtext"><strong>Headline:</strong> ${escapeHtml(v.headline)}</div>
+        <div class="vtext"><strong>Primary text:</strong> ${escapeHtml(v.primary_text)}</div>
+        <div class="vtext"><strong>Description:</strong> ${escapeHtml(v.description)}</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;" data-copy-variation="${i}">Másolás</button>
+      </div>`).join('');
+  }
+  if(type === 'ads_copy'){
+    const section = (label, items) => `<div class="variation-card"><div class="vlabel">${label}</div>${(items||[]).map(t=>`<div class="vtext">${escapeHtml(t)}</div>`).join('')}</div>`;
+    return section('Headlines (30 kar.)', content.headlines) + section('Long headlines (90 kar.)', content.long_headlines) + section('Descriptions (90 kar.)', content.descriptions);
+  }
+  if(type === 'landing_page'){
+    return `<iframe class="iframe-preview" sandbox="allow-scripts" srcdoc="${escapeHtml(content.html||'')}"></iframe>`;
+  }
+  // markdown-alapú blokkok: campaign_strategy, campaign_optimization, seo_audit, blog_post, competitor_analysis
+  let extra = '';
+  if(content.title) extra += `<h1>${escapeHtml(content.title)}</h1>`;
+  if(content.meta_description) extra += `<p class="muted"><em>Meta leírás: ${escapeHtml(content.meta_description)}</em></p>`;
+  return `<div class="output-content">${extra}${renderMarkdown(content.markdown||'')}</div>`;
+}
+
+function getExportPlainText(type, content){
+  if(type === 'meta_copy'){
+    return (content.variations||[]).map((v,i)=>`Variáció ${i+1}\nHeadline: ${v.headline}\nPrimary text: ${v.primary_text}\nDescription: ${v.description}`).join('\n\n');
+  }
+  if(type === 'ads_copy'){
+    return `Headlines:\n${(content.headlines||[]).join('\n')}\n\nLong headlines:\n${(content.long_headlines||[]).join('\n')}\n\nDescriptions:\n${(content.descriptions||[]).join('\n')}`;
+  }
+  return content.markdown || '';
+}
+
+function drawBlockEditor(state){
+  const { clientId, client, context, blockType, block, versions, agentOutputs, generating } = state;
+  const cfg = BLOCK_TYPES[blockType];
+  const body = document.getElementById('pageBody');
+  const inputValues = block.input || {};
+
+  const backHref = clientId ? `#/client/${clientId}` : '#/standalone';
+  const content = state.viewingVersion ? state.viewingVersion.content : block.content;
+
+  body.innerHTML = `
+    <div class="block-editor-header">
+      <div class="flex gap-12" style="align-items:center;">
+        <button class="btn btn-ghost btn-sm" data-nav="${backHref}">&larr; Vissza</button>
+        <h1 style="margin:0;">${cfg.label}</h1>
+        <span class="badge badge-${block.status}">${generating && block.status==='reviewing' ? 'Agent ellenőrzés alatt' : BLOCK_STATUS_LABELS[block.status]}</span>
+      </div>
+      <div class="flex gap-8">
+        ${versions.length ? `<select class="version-select" id="versionSelect">
+          <option value="">Aktuális verzió</option>
+          ${versions.map(v=>`<option value="${v.id}" ${state.viewingVersion?.id===v.id?'selected':''}>v${v.version_number} – ${formatDate(v.saved_at)}</option>`).join('')}
+        </select>` : ''}
+        ${state.viewingVersion ? `<button class="btn btn-ghost btn-sm" id="restoreBtn">Visszaállítás</button>` : ''}
+      </div>
+    </div>
+
+    <div class="block-editor-grid">
+      <div class="card">
+        <div class="panel-title">Input</div>
+        <form id="blockForm">
+          ${cfg.inputs.map(f=> inputFieldHtml(f, inputValues[f.key] !== undefined ? inputValues[f.key] : (f.prefill ? resolvePrefill(f.prefill, client, context) : f.default))).join('')}
+          <button type="submit" class="btn btn-accent" id="genBtn" ${generating?'disabled':''}>
+            ${generating ? '<span class="spinner"></span> Generálás…' : (block.content ? 'Újragenerálás' : 'Generálás')}
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="flex-between">
+          <div class="panel-title">AI Output</div>
+          ${content ? `<div class="flex gap-8">
+            ${cfg.exportFormat==='copy' ? `<button class="btn btn-ghost btn-sm" id="copyAllBtn">Összes másolása</button>` : ''}
+            ${cfg.exportFormat==='docx' ? `<button class="btn btn-ghost btn-sm" id="exportBtn">Export (.docx)</button>` : ''}
+            ${cfg.exportFormat==='html' ? `<button class="btn btn-ghost btn-sm" id="exportBtn">Export (.html)</button>` : ''}
+            ${!state.viewingVersion && !generating && block.status==='reviewing' ? `<button class="btn btn-primary btn-sm" id="approveBtn">Jóváhagyás</button>` : ''}
+            ${!state.viewingVersion && !generating && block.status==='approved' ? `<button class="btn btn-ghost btn-sm" id="deliverBtn">Leszállítottnak jelöl</button>` : ''}
+          </div>` : ''}
+        </div>
+        <div id="outputArea">${renderOutputContent(blockType, content)}</div>
+
+        ${(!state.viewingVersion && agentOutputs.filter(a=>cfg.reviewAgents.includes(a.agent_type)).length) ? `
+        <details class="review-panel" open>
+          <summary>Agent ellenőrzés (${agentOutputs.filter(a=>cfg.reviewAgents.includes(a.agent_type)).length})</summary>
+          ${agentOutputs.filter(a=>cfg.reviewAgents.includes(a.agent_type)).map(a=>`
+            <div class="review-block">
+              <div class="review-agent-label">${a.agent_type}</div>
+              ${escapeHtml(a.output)}
+            </div>`).join('')}
+        </details>` : ''}
+      </div>
+    </div>
+  `;
+  wireNav(body);
+
+  if(body.querySelector('#versionSelect')){
+    body.querySelector('#versionSelect').addEventListener('change', (e)=>{
+      const vid = e.target.value;
+      const v = versions.find(x=>x.id===vid) || null;
+      drawBlockEditor({ ...state, viewingVersion: v });
+    });
+  }
+  if(body.querySelector('#restoreBtn')){
+    body.querySelector('#restoreBtn').addEventListener('click', async ()=>{
+      const restoredContent = state.viewingVersion.content;
+      const nextVersion = (versions[0]?.version_number || 0) + 1;
+      await DB.createVersion(block.id, nextVersion, restoredContent, `Visszaállítva: v${state.viewingVersion.version_number}`);
+      const updatedBlock = await DB.updateBlock(block.id, { content: restoredContent });
+      const updatedVersions = await DB.listVersions(block.id);
+      toast('Verzió visszaállítva', 'success');
+      drawBlockEditor({ ...state, block: updatedBlock, versions: updatedVersions, viewingVersion:null });
+    });
+  }
+  if(body.querySelector('#copyAllBtn')){
+    body.querySelector('#copyAllBtn').addEventListener('click', ()=> copyToClipboard(getExportPlainText(blockType, content)));
+  }
+  body.querySelectorAll('[data-copy-variation]').forEach(btn=> btn.addEventListener('click', ()=>{
+    const i = Number(btn.getAttribute('data-copy-variation'));
+    const v = content.variations[i];
+    copyToClipboard(`Headline: ${v.headline}\nPrimary text: ${v.primary_text}\nDescription: ${v.description}`);
+  }));
+  if(body.querySelector('#exportBtn')){
+    body.querySelector('#exportBtn').addEventListener('click', async ()=>{
+      const filenameBase = (client?.name || 'idonyero') + '-' + blockType;
+      if(cfg.exportFormat === 'docx'){
+        await exportMarkdownAsDocx(filenameBase, content.title || cfg.label, content.markdown, content.meta_description);
+      } else if(cfg.exportFormat === 'html'){
+        exportHtmlFile(filenameBase, content.html);
+      }
+    });
+  }
+  if(body.querySelector('#approveBtn')){
+    body.querySelector('#approveBtn').addEventListener('click', async ()=>{
+      const updated = await DB.updateBlock(block.id, { status:'approved' });
+      toast('Blokk jóváhagyva', 'success');
+      drawBlockEditor({ ...state, block: updated });
+    });
+  }
+  if(body.querySelector('#deliverBtn')){
+    body.querySelector('#deliverBtn').addEventListener('click', async ()=>{
+      const updated = await DB.updateBlock(block.id, { status:'delivered' });
+      toast('Blokk megjelölve leszállítottként', 'success');
+      drawBlockEditor({ ...state, block: updated });
+    });
+  }
+
+  // CSV fájl beolvasás (campaign_optimization)
+  cfg.inputs.filter(f=>f.type==='csvfile').forEach(f=>{
+    const fileInput = body.querySelector('#f_'+f.key+'_file');
+    if(fileInput){
+      fileInput.addEventListener('change', ()=>{
+        const file = fileInput.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { body.querySelector('#f_'+f.key).value = reader.result; };
+        reader.readAsText(file);
+      });
+    }
+  });
+
+  body.querySelector('#blockForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const inputData = {};
+    cfg.inputs.forEach(f=>{
+      if(f.type==='checkbox') inputData[f.key] = fd.get(f.key) === 'on';
+      else inputData[f.key] = fd.get(f.key);
+    });
+    await DB.updateBlock(block.id, { input: inputData, status:'reviewing' });
+    drawBlockEditor({ ...state, block: { ...block, input: inputData, status:'reviewing' }, generating:true, viewingVersion:null });
+    await runBlockGeneration({ clientId, client, context, blockType, blockId: block.id, inputData });
+  });
+}
+
+async function runBlockGeneration({ clientId, client, context, blockType, blockId, inputData }){
+  const cfg = BLOCK_TYPES[blockType];
+  try{
+    const userMessage = cfg.inputs.map(f=>{
+      let v = inputData[f.key];
+      if(f.type==='checkbox') v = v ? 'igen' : 'nem';
+      return `${f.label}: ${v || '-'}`;
+    }).join('\n');
+
+    const system = buildSystemPrompt(cfg.agentType, context);
+    const { text } = await callClaude({ system, userContent: userMessage, max_tokens: 8000 });
+    const parsedContent = extractJson(text) || { markdown: text };
+
+    await DB.createAgentOutput(blockId, cfg.agentType, inputData, text);
+
+    const versions = await DB.listVersions(blockId);
+    const nextVersion = (versions[0]?.version_number || 0) + 1;
+    await DB.createVersion(blockId, nextVersion, parsedContent, null);
+    await DB.updateBlock(blockId, { content: parsedContent });
+
+    // Ellenőrző agentsek sorban lefutnak
+    for(const reviewerType of cfg.reviewAgents){
+      try{
+        const reviewInput = typeof parsedContent === 'object' ? JSON.stringify(parsedContent, null, 2) : String(parsedContent);
+        const { text: reviewText } = await callClaude({
+          system: AGENT_PROMPTS[reviewerType],
+          userContent: `Ellenőrizendő tartalom (${cfg.label}):\n\n${reviewInput}`,
+          max_tokens: 2000,
+        });
+        await DB.createAgentOutput(blockId, reviewerType, { source: cfg.agentType }, reviewText);
+      } catch(reviewErr){
+        console.warn('Reviewer agent failed', reviewerType, reviewErr);
+      }
+    }
+
+    toast('Generálás kész', 'success');
+  } catch(err){
+    console.error(err);
+    toast('Generálás sikertelen: ' + (err.message||err), 'error');
+    await DB.updateBlock(blockId, { status:'draft' });
+  } finally{
+    const freshBlock = await DB.getBlock(blockId);
+    const freshVersions = await DB.listVersions(blockId);
+    const freshOutputs = await DB.listAgentOutputs(blockId);
+    drawBlockEditor({ clientId, client, context, blockType, block: freshBlock, versions: freshVersions, agentOutputs: freshOutputs, viewingVersion:null, generating:false });
+  }
+}
+
+/* Induló útvonal feldolgozása */
+route();
+</script>
+</body>
+</html>
